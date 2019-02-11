@@ -119,6 +119,12 @@ class PurchaseService extends PaymentService
             return $serviceResponse;
         }
 
+        // check for redirect during CompletePurchase (eg. when insufficient funds)
+        if ($serviceResponse->isRedirect()) {
+            $this->createMessage('PurchaseRedirectResponse', $response);
+            return $serviceResponse;
+        }
+
         // only update payment status if we're not waiting for a notification
         if (!$serviceResponse->isAwaitingNotification()) {
             $this->markCompleted('Captured', $serviceResponse, $response);
